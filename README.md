@@ -70,5 +70,6 @@ To type check:
 ```bash
 pip install mypy
 mypy .
+
+-- $env:PYTHONPATH = "D:\autoEDA\autoeda"; python autoeda_plus\cli\autoeda.py 'location.csv'
 ```
-<!-- -- $env:PYTHONPATH = "D:\autoEDA\autoeda"; python autoeda_plus\cli\autoeda.py 'location.csv' -->
