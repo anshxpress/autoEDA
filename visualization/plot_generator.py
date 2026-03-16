@@ -3,7 +3,7 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
-def generate_histogram(df, column):
+def generate_histogram(df: pd.DataFrame, column: str) -> str:
     """
     Generate histogram code for a numerical column.
 
@@ -22,7 +22,7 @@ plt.show()
 """
     return code
 
-def generate_boxplot(df, column):
+def generate_boxplot(df: pd.DataFrame, column: str) -> str:
     """
     Generate boxplot code for a numerical column.
 
@@ -41,7 +41,7 @@ plt.show()
 """
     return code
 
-def generate_bar_chart(df, column):
+def generate_bar_chart(df: pd.DataFrame, column: str) -> str:
     """
     Generate bar chart code for a categorical column.
 
@@ -60,7 +60,7 @@ plt.show()
 """
     return code
 
-def generate_correlation_heatmap(corr_matrix):
+def generate_correlation_heatmap(corr_matrix: pd.DataFrame) -> str:
     """
     Generate correlation heatmap code.
 
@@ -78,7 +78,7 @@ plt.show()
 """
     return code
 
-def generate_pairplot(df):
+def generate_pairplot(df: pd.DataFrame) -> str:
     """
     Generate pairplot code for numerical columns.
 

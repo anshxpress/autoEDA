@@ -6,7 +6,7 @@ from core.feature_detector import detect_data_types, detect_missing_values, dete
 from core.eda_analyzer import generate_descriptive_stats, analyze_numerical_features, analyze_categorical_features, detect_datetime_features, calculate_correlations, detect_outliers_iqr
 from visualization.plot_generator import generate_histogram, generate_boxplot, generate_bar_chart, generate_correlation_heatmap, generate_pairplot
 
-def build_eda_notebook(csv_path, output_path='EDA_notebook.ipynb'):
+def build_eda_notebook(csv_path: str, output_path: str = 'EDA_notebook.ipynb') -> None:
     """
     Build a Jupyter Notebook for EDA.
 

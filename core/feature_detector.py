@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
+from typing import Dict, Any, Tuple
 
-def detect_data_types(df):
+def detect_data_types(df: pd.DataFrame) -> Dict[str, Any]:
     """
     Detect and return data types for each column.
 
@@ -13,7 +14,7 @@ def detect_data_types(df):
     """
     return df.dtypes.to_dict()
 
-def detect_missing_values(df):
+def detect_missing_values(df: pd.DataFrame) -> pd.Series:
     """
     Detect missing values in the DataFrame.
 
@@ -25,7 +26,7 @@ def detect_missing_values(df):
     """
     return df.isnull().sum()
 
-def detect_duplicates(df):
+def detect_duplicates(df: pd.DataFrame) -> int:
     """
     Detect duplicate rows in the DataFrame.
 
@@ -37,7 +38,7 @@ def detect_duplicates(df):
     """
     return df.duplicated().sum()
 
-def get_dataset_shape(df):
+def get_dataset_shape(df: pd.DataFrame) -> Tuple[int, int]:
     """
     Get the shape of the DataFrame.
 
