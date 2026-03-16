@@ -1,6 +1,6 @@
 import pandas as pd
-from typing import Tuple, Optional
-from ..core.schema_detector import detect_column_types, detect_potential_target
+from typing import Tuple, Optional, Dict
+from autoeda_plus.core.schema_detector import detect_column_types, detect_potential_target
 
 def determine_problem_type(df: pd.DataFrame, target_col: str, column_types: Dict[str, str]) -> str:
     """

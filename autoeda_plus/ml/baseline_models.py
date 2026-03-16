@@ -4,7 +4,7 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, mean_squared_error, r2_score
 from typing import Dict, Any
-from .model_selector import determine_problem_type, prepare_features_and_target, select_baseline_model
+from autoeda_plus.ml.model_selector import determine_problem_type, prepare_features_and_target, select_baseline_model
 
 def train_baseline_model(df: pd.DataFrame, target_col: str, column_types: Dict[str, str]) -> Dict[str, Any]:
     """

@@ -2,16 +2,16 @@ import nbformat as nbf
 from nbformat.v4 import new_notebook, new_code_cell, new_markdown_cell
 import pandas as pd
 from typing import Dict, Any
-from ..core.data_loader import load_csv, validate_dataset
-from ..core.schema_detector import detect_column_types, detect_potential_target, get_column_summary
-from ..core.data_profiler import profile_dataset, detect_data_quality_issues
-from ..analysis.statistics_engine import compute_numerical_statistics, compute_categorical_statistics
-from ..analysis.correlation_engine import compute_correlation_matrix, detect_strong_correlations
-from ..analysis.outlier_detector import get_outlier_summary
-from ..visualization.plot_engine import (generate_histogram, generate_boxplot, generate_countplot,
+from autoeda_plus.core.data_loader import load_csv, validate_dataset
+from autoeda_plus.core.schema_detector import detect_column_types, detect_potential_target, get_column_summary
+from autoeda_plus.core.data_profiler import profile_dataset, detect_data_quality_issues
+from autoeda_plus.analysis.statistics_engine import compute_numerical_statistics, compute_categorical_statistics
+from autoeda_plus.analysis.correlation_engine import compute_correlation_matrix, detect_strong_correlations
+from autoeda_plus.analysis.outlier_detector import get_outlier_summary
+from autoeda_plus.visualization.plot_engine import (generate_histogram, generate_boxplot, generate_countplot,
                                        generate_correlation_heatmap, generate_scatterplot, generate_missing_values_plot)
-from ..ml.baseline_models import train_baseline_model
-from ..insights.insight_generator import generate_insights, generate_feature_engineering_suggestions
+from autoeda_plus.ml.baseline_models import train_baseline_model
+from autoeda_plus.insights.insight_generator import generate_insights, generate_feature_engineering_suggestions
 
 def build_comprehensive_eda_notebook(csv_path: str, output_path: str = 'EDA_report.ipynb') -> None:
     """

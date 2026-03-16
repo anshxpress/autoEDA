@@ -1,8 +1,8 @@
 import pandas as pd
 from typing import List, Dict, Any
-from ..analysis.statistics_engine import compute_numerical_statistics
-from ..analysis.correlation_engine import detect_strong_correlations
-from ..analysis.outlier_detector import get_outlier_summary
+from autoeda_plus.analysis.statistics_engine import compute_numerical_statistics
+from autoeda_plus.analysis.correlation_engine import detect_strong_correlations
+from autoeda_plus.analysis.outlier_detector import get_outlier_summary
 
 def generate_insights(df: pd.DataFrame, column_types: Dict[str, str],
                      corr_matrix: pd.DataFrame, outlier_summary: Dict[str, Any]) -> List[str]:
