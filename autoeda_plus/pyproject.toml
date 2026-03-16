@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "autoeda"
+name = "autoeda-plus"
 version = "0.1.0"
-description = "Automated Exploratory Data Analysis Notebook Generator"
+description = "Automated Intelligent Exploratory Data Analysis"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.9"
@@ -15,7 +15,7 @@ authors = [
 maintainers = [
     {name = "Ansh", email = "ansh@example.com"},
 ]
-keywords = ["eda", "data-analysis", "jupyter", "automation"]
+keywords = ["eda", "data-analysis", "jupyter", "automation", "machine-learning"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -36,6 +36,7 @@ dependencies = [
     "seaborn>=0.12.0",
     "nbformat>=5.9.0",
     "scipy>=1.11.0",
+    "scikit-learn>=1.3.0",
 ]
 
 [project.urls]
@@ -44,13 +45,13 @@ Repository = "https://github.com/anshxpress/autoEDA"
 Issues = "https://github.com/anshxpress/autoEDA/issues"
 
 [project.scripts]
-autoeda = "autoeda.cli.autoeda:main"
+autoeda = "autoeda_plus.cli.autoeda:main"
 
 [tool.setuptools]
-packages = ["autoeda", "autoeda.core", "autoeda.cli", "autoeda.nb_builder", "autoeda.visualization"]
+packages = ["autoeda_plus", "autoeda_plus.core", "autoeda_plus.analysis", "autoeda_plus.visualization", "autoeda_plus.ml", "autoeda_plus.insights", "autoeda_plus.notebook", "autoeda_plus.cli"]
 
 [tool.setuptools.package-dir]
-"" = "."
+"" = "autoeda_plus"
 
 [tool.ruff]
 line-length = 88
@@ -64,7 +65,7 @@ ignore = ["S101", "COM812", "ISC001"]
 "__init__.py" = ["F401"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["autoeda"]
+known-first-party = ["autoeda_plus"]
 
 [tool.mypy]
 python_version = "3.9"
@@ -82,5 +83,5 @@ warn_unreachable = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-module = ["scipy.*", "seaborn.*", "matplotlib.*"]
+module = ["scipy.*", "seaborn.*", "matplotlib.*", "sklearn.*"]
 ignore_missing_imports = true
