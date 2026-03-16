@@ -1,6 +1,6 @@
-# AutoEDA++
+# OFFLINE AutoEDA++
 
-Automated Intelligent Exploratory Data Analysis
+Automated OFFLINE Intelligent Exploratory Data Analysis
 
 ## Installation
 
