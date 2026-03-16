@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
 from scipy import stats
+from typing import Dict, List, Any
 
-def generate_descriptive_stats(df):
+def generate_descriptive_stats(df: pd.DataFrame) -> pd.DataFrame:
     """
     Generate descriptive statistics for the DataFrame.
 
@@ -14,7 +15,7 @@ def generate_descriptive_stats(df):
     """
     return df.describe(include='all')
 
-def analyze_numerical_features(df):
+def analyze_numerical_features(df: pd.DataFrame) -> Dict[str, Dict[str, float]]:
     """
     Analyze numerical features: mean, median, std, skewness.
 
@@ -25,7 +26,7 @@ def analyze_numerical_features(df):
         dict: Dictionary with stats for numerical columns.
     """
     numerical_cols = df.select_dtypes(include=[np.number]).columns
-    stats_dict = {}
+    stats_dict: Dict[str, Dict[str, float]] = {}
     for col in numerical_cols:
         stats_dict[col] = {
             'mean': df[col].mean(),
@@ -35,7 +36,7 @@ def analyze_numerical_features(df):
         }
     return stats_dict
 
-def analyze_categorical_features(df):
+def analyze_categorical_features(df: pd.DataFrame) -> Dict[str, Dict[str, Any]]:
     """
     Analyze categorical features: unique counts, frequencies.
 
@@ -46,7 +47,7 @@ def analyze_categorical_features(df):
         dict: Dictionary with stats for categorical columns.
     """
     categorical_cols = df.select_dtypes(include=['object', 'category']).columns
-    stats_dict = {}
+    stats_dict: Dict[str, Dict[str, Any]] = {}
     for col in categorical_cols:
         stats_dict[col] = {
             'unique_count': df[col].nunique(),
@@ -54,7 +55,7 @@ def analyze_categorical_features(df):
         }
     return stats_dict
 
-def detect_datetime_features(df):
+def detect_datetime_features(df: pd.DataFrame) -> List[str]:
     """
     Detect and convert datetime columns.
 
@@ -64,7 +65,7 @@ def detect_datetime_features(df):
     Returns:
         list: List of datetime column names.
     """
-    datetime_cols = []
+    datetime_cols: List[str] = []
     for col in df.columns:
         try:
             pd.to_datetime(df[col])
@@ -73,7 +74,7 @@ def detect_datetime_features(df):
             pass
     return datetime_cols
 
-def calculate_correlations(df):
+def calculate_correlations(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate correlation matrix for numerical columns.
 
@@ -86,7 +87,7 @@ def calculate_correlations(df):
     numerical_df = df.select_dtypes(include=[np.number])
     return numerical_df.corr()
 
-def detect_outliers_iqr(df, column):
+def detect_outliers_iqr(df: pd.DataFrame, column: str) -> pd.Series:
     """
     Detect outliers using IQR method.
 
@@ -104,7 +105,7 @@ def detect_outliers_iqr(df, column):
     upper_bound = Q3 + 1.5 * IQR
     return (df[column] < lower_bound) | (df[column] > upper_bound)
 
-def detect_outliers_zscore(df, column, threshold=3):
+def detect_outliers_zscore(df: pd.DataFrame, column: str, threshold: float = 3) -> pd.Series:
     """
     Detect outliers using Z-score method.
 

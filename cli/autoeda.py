@@ -3,7 +3,7 @@ import argparse
 import os
 from nb_builder.notebook_builder import build_eda_notebook
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description='AutoEDA: Automated Exploratory Data Analysis Notebook Generator')
     parser.add_argument('csv_file', help='Path to the CSV file')
     parser.add_argument('--output', '-o', default=None, help='Output notebook filename (default: EDA_<csv_filename>.ipynb)')

@@ -1,34 +1,75 @@
-# AutoEDA
+# AutoEDA++
 
-Automated Exploratory Data Analysis Notebook Generator
+Automated Intelligent Exploratory Data Analysis
 
 ## Installation
 
 1. Clone or download the repository.
 2. Install dependencies: `pip install -r requirements.txt`
 
+Or install as a package:
+
+```bash
+pip install -e .
+```
+
 ## Usage
 
 Run the tool with a CSV file:
 
 ```bash
-python  $env:PYTHONPATH = "d:\autoEDA\autoeda"; python cli\autoeda.py'location.csv'                                                         
+autoeda sample.csv
+```
+
+Or with custom output:
+
+```bash
+autoeda sample.csv --output my_analysis.ipynb
 ```
 
 Options:
 
 - `--output filename`: Specify output notebook name (default: EDA_dataset.ipynb)
+- `--summary-only`: Generate only summary statistics without plots
 
 ## Features
 
-- Automatic dataset loading and type detection
-- Missing value and duplicate analysis
-- Statistical summaries for numerical and categorical features
-- Visualizations: histograms, boxplots, bar charts, correlation heatmaps
-- Outlier detection
-- Generated Jupyter Notebook with all analysis
+- **Automatic dataset profiling**: Column type inference, missing value detection, duplicate analysis
+- **Statistical summaries**: Comprehensive metrics for numerical and categorical features
+- **Data quality diagnostics**: Detection of common dataset issues and inconsistencies
+- **Visualization system**: Histograms, boxplots, count plots, correlation heatmaps, scatter plots
+- **Correlation analysis**: Matrix computation and strong relationship detection
+- **Outlier detection**: IQR and Z-score methods with visual confirmation
+- **Feature engineering suggestions**: Automated recommendations for data preprocessing
+- **Baseline machine learning models**: Automatic training and evaluation of simple models
+- **Structured notebook generation**: Comprehensive Jupyter reports with all analyses
 
 ## Requirements
 
 - Python 3.9+
-- Libraries: pandas, numpy, matplotlib, seaborn, nbformat, scipy
+- Libraries: pandas, numpy, matplotlib, seaborn, nbformat, scipy, scikit-learn
+
+## Development
+
+To run tests:
+
+```bash
+pip install pytest
+pytest
+```
+
+To lint:
+
+```bash
+pip install ruff
+ruff check .
+```
+
+To type check:
+
+```bash
+pip install mypy
+mypy .
+
+-- $env:PYTHONPATH = "D:\autoEDA\autoeda"; python autoeda_plus\cli\autoeda.py 'location.csv'
+```

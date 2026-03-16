@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-import numpy as np
+from typing import Dict, List
 
 def generate_histogram(df: pd.DataFrame, column: str) -> str:
     """
@@ -17,7 +17,9 @@ def generate_histogram(df: pd.DataFrame, column: str) -> str:
     code = f"""
 plt.figure(figsize=(10, 6))
 sns.histplot(data=df, x='{column}', kde=True)
-plt.title('Histogram of {column}')
+plt.title('Distribution of {column}')
+plt.xlabel('{column}')
+plt.ylabel('Frequency')
 plt.show()
 """
     return code
@@ -34,28 +36,32 @@ def generate_boxplot(df: pd.DataFrame, column: str) -> str:
         str: Python code for boxplot.
     """
     code = f"""
-plt.figure(figsize=(10, 6))
-sns.boxplot(data=df, x='{column}')
+plt.figure(figsize=(8, 6))
+sns.boxplot(data=df, y='{column}')
 plt.title('Boxplot of {column}')
+plt.ylabel('{column}')
 plt.show()
 """
     return code
 
-def generate_bar_chart(df: pd.DataFrame, column: str) -> str:
+def generate_countplot(df: pd.DataFrame, column: str) -> str:
     """
-    Generate bar chart code for a categorical column.
+    Generate countplot for a categorical column.
 
     Args:
         df (pd.DataFrame): Input DataFrame.
         column (str): Column name.
 
     Returns:
-        str: Python code for bar chart.
+        str: Python code for countplot.
     """
     code = f"""
 plt.figure(figsize=(10, 6))
-df['{column}'].value_counts().plot(kind='bar')
-plt.title('Bar Chart of {column}')
+sns.countplot(data=df, x='{column}', order=df['{column}'].value_counts().index)
+plt.title('Count of {column}')
+plt.xlabel('{column}')
+plt.ylabel('Count')
+plt.xticks(rotation=45)
 plt.show()
 """
     return code
@@ -72,28 +78,48 @@ def generate_correlation_heatmap(corr_matrix: pd.DataFrame) -> str:
     """
     code = f"""
 plt.figure(figsize=(12, 8))
-sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0, fmt='.2f')
 plt.title('Correlation Heatmap')
 plt.show()
 """
     return code
 
-def generate_pairplot(df: pd.DataFrame) -> str:
+def generate_scatterplot(df: pd.DataFrame, x_col: str, y_col: str) -> str:
     """
-    Generate pairplot code for numerical columns.
+    Generate scatterplot for two numerical columns.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame.
+        x_col (str): X-axis column.
+        y_col (str): Y-axis column.
+
+    Returns:
+        str: Python code for scatterplot.
+    """
+    code = f"""
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=df, x='{x_col}', y='{y_col}')
+plt.title('{y_col} vs {x_col}')
+plt.xlabel('{x_col}')
+plt.ylabel('{y_col}')
+plt.show()
+"""
+    return code
+
+def generate_missing_values_plot(df: pd.DataFrame) -> str:
+    """
+    Generate missing values heatmap.
 
     Args:
         df (pd.DataFrame): Input DataFrame.
 
     Returns:
-        str: Python code for pairplot.
+        str: Python code for missing values plot.
     """
-    numerical_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-    if len(numerical_cols) > 1:
-        code = f"""
-sns.pairplot(df[{numerical_cols}])
+    code = f"""
+plt.figure(figsize=(12, 8))
+sns.heatmap(df.isnull(), cbar=False, cmap='viridis')
+plt.title('Missing Values Heatmap')
 plt.show()
 """
-    else:
-        code = "# Not enough numerical columns for pairplot"
     return code
