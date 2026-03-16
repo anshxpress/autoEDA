@@ -53,7 +53,29 @@ def build_comprehensive_eda_notebook(csv_path: str, output_path: str = 'EDA_repo
 
     # Dataset Loading
     nb.cells.append(new_markdown_cell("## 2. Dataset Loading"))
-    nb.cells.append(new_code_cell(f"import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.ensemble import RandomForestClassifier, RandomForestRegressor\n\n# Load dataset\n{df_name} = pd.read_csv('{csv_path}')\nprint('Dataset loaded successfully!')\nprint(f'Shape: {df_name}.shape')"))
+    # Convert backslashes to forward slashes for cross-platform compatibility
+    csv_path_forward = csv_path.replace('\\', '/')
+    nb.cells.append(new_code_cell(f"""import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+
+# Load dataset with encoding handling
+encodings_to_try = ['utf-8', 'latin1', 'cp1252', 'iso-8859-1']
+for encoding in encodings_to_try:
+    try:
+        {df_name} = pd.read_csv('{csv_path_forward}', encoding=encoding, parse_dates=True, low_memory=False)
+        print(f'Dataset loaded successfully with encoding: {{encoding}}')
+        break
+    except (UnicodeDecodeError, UnicodeError):
+        continue
+else:
+    # Fallback
+    {df_name} = pd.read_csv('{csv_path_forward}', parse_dates=True, low_memory=False)
+    print('Dataset loaded successfully!')
+print(f'Shape: {df_name}.shape')"""))
 
     # Dataset Overview
     nb.cells.append(new_markdown_cell("## 3. Dataset Overview"))
@@ -82,11 +104,18 @@ def build_comprehensive_eda_notebook(csv_path: str, output_path: str = 'EDA_repo
     # Feature Distributions
     nb.cells.append(new_markdown_cell("## 6. Feature Distributions"))
 
+    # Datetime Analysis
+    datetime_cols = [col for col, t in column_types.items() if t == 'datetime']
+    if datetime_cols:
+        nb.cells.append(new_markdown_cell("### Datetime Features"))
+        for col in datetime_cols:  # Show all datetime columns
+            nb.cells.append(new_code_cell(f"print('Datetime column: {col}')\nprint({df_name}['{col}'].describe())\n\n# Year distribution\n{df_name}['{col}'].dt.year.value_counts().sort_index().plot(kind='bar')\nplt.title('Distribution by Year - {col}')\nplt.xlabel('Year')\nplt.ylabel('Count')\nplt.show()\n\n# Month distribution\n{df_name}['{col}'].dt.month.value_counts().sort_index().plot(kind='bar')\nplt.title('Distribution by Month - {col}')\nplt.xlabel('Month')\nplt.ylabel('Count')\nplt.show()"))
+
     # Numerical distributions
     num_cols = [col for col, t in column_types.items() if t == 'numerical']
     if num_cols:
         nb.cells.append(new_markdown_cell("### Numerical Features"))
-        for col in num_cols[:3]:  # Limit to 3
+        for col in num_cols:  # Show all numerical columns
             nb.cells.append(new_code_cell(generate_histogram(df, col)))
             nb.cells.append(new_code_cell(generate_boxplot(df, col)))
 
@@ -94,7 +123,7 @@ def build_comprehensive_eda_notebook(csv_path: str, output_path: str = 'EDA_repo
     cat_cols = [col for col, t in column_types.items() if t == 'categorical']
     if cat_cols:
         nb.cells.append(new_markdown_cell("### Categorical Features"))
-        for col in cat_cols[:3]:  # Limit to 3
+        for col in cat_cols:  # Show all categorical columns
             nb.cells.append(new_code_cell(generate_countplot(df, col)))
 
     # Correlation Analysis
@@ -131,9 +160,9 @@ def build_comprehensive_eda_notebook(csv_path: str, output_path: str = 'EDA_repo
     else:
         nb.cells.append(new_markdown_cell("No specific feature engineering suggestions at this time."))
 
-    # Baseline Machine Learning
-    nb.cells.append(new_markdown_cell("## 10. Baseline Machine Learning Model"))
+    # Baseline Machine Learning (only if successful)
     if ml_results['success']:
+        nb.cells.append(new_markdown_cell("## 10. Baseline Machine Learning Model"))
         problem_type = ml_results['problem_type']
         model_name = ml_results['model']
         metrics = ml_results['metrics']
@@ -151,11 +180,9 @@ def build_comprehensive_eda_notebook(csv_path: str, output_path: str = 'EDA_repo
             fi_sorted = sorted(fi.items(), key=lambda x: x[1], reverse=True)[:5]
             fi_text = "\\n".join(f"- {col}: {imp:.4f}" for col, imp in fi_sorted)
             nb.cells.append(new_markdown_cell(f"### Top 5 Feature Importances:\n{fi_text}"))
-    else:
-        nb.cells.append(new_markdown_cell(f"Could not train baseline model: {ml_results.get('error', 'Unknown error')}"))
 
     # Key Insights Summary
-    nb.cells.append(new_markdown_cell("## 11. Key Insights Summary"))
+    nb.cells.append(new_markdown_cell("## 10. Key Insights Summary"))
     if insights:
         insights_text = "\\n".join(f"- {insight}" for insight in insights)
         nb.cells.append(new_markdown_cell(insights_text))

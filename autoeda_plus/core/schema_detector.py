@@ -46,7 +46,7 @@ def detect_column_types(df: pd.DataFrame) -> Dict[str, str]:
 
 def detect_potential_target(df: pd.DataFrame, column_types: Dict[str, str]) -> str:
     """
-    Detect potential target column for ML.
+    Detect potential target column for ML, preferring suitable columns.
 
     Args:
         df (pd.DataFrame): Input DataFrame.
@@ -55,19 +55,28 @@ def detect_potential_target(df: pd.DataFrame, column_types: Dict[str, str]) -> s
     Returns:
         str: Potential target column name.
     """
-    # Look for binary categorical or numerical with few unique values
-    candidates = []
-    for col, ctype in column_types.items():
-        if ctype == 'categorical' and df[col].nunique() == 2:
-            candidates.append(col)
-        elif ctype == 'numerical' and df[col].nunique() <= 5:
-            candidates.append(col)
+    # Prefer numerical columns with reasonable range for regression
+    numerical_cols = [col for col, t in column_types.items() if t == 'numerical']
+    for col in numerical_cols:
+        if df[col].nunique() > 10 and df[col].min() >= 0:  # Positive values, not binary
+            return col
 
-    # Prefer the last column if it's a candidate
-    if candidates and candidates[-1] in df.columns:
-        return candidates[-1]
+    # Then binary categorical
+    categorical_cols = [col for col, t in column_types.items() if t == 'categorical']
+    for col in categorical_cols:
+        if df[col].nunique() == 2:
+            return col
 
-    # Fallback to last column
+    # Then small categorical
+    for col in categorical_cols:
+        if 2 < df[col].nunique() <= 5:
+            return col
+
+    # Fallback to last numerical
+    if numerical_cols:
+        return numerical_cols[-1]
+
+    # Last resort
     return df.columns[-1]
 
 def get_column_summary(df: pd.DataFrame, column_types: Dict[str, str]) -> Dict[str, Any]:

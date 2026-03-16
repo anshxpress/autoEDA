@@ -3,7 +3,7 @@ from typing import Tuple
 
 def load_csv(file_path: str) -> pd.DataFrame:
     """
-    Load a CSV file into a pandas DataFrame with automatic type inference.
+    Load a CSV file into a pandas DataFrame with automatic encoding detection.
 
     Args:
         file_path (str): Path to the CSV file.
@@ -11,16 +11,21 @@ def load_csv(file_path: str) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Loaded DataFrame.
     """
+    encodings_to_try = ['utf-8', 'latin1', 'cp1252', 'iso-8859-1']
+    
+    for encoding in encodings_to_try:
+        try:
+            df = pd.read_csv(file_path, encoding=encoding, parse_dates=True, low_memory=False)
+            return df
+        except (UnicodeDecodeError, UnicodeError):
+            continue
+    
+    # If all encodings fail, try without encoding (pandas default)
     try:
-        # Try to infer dates and handle encoding
         df = pd.read_csv(file_path, parse_dates=True, low_memory=False)
         return df
-    except UnicodeDecodeError:
-        # Fallback to latin1 encoding
-        df = pd.read_csv(file_path, encoding='latin1', parse_dates=True, low_memory=False)
-        return df
     except Exception as e:
-        raise ValueError(f"Error loading CSV file: {e}")
+        raise ValueError(f"Error loading CSV file with any encoding: {e}")
 
 def validate_dataset(df: pd.DataFrame) -> Tuple[bool, str]:
     """
