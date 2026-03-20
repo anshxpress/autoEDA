@@ -44,7 +44,7 @@ Options:
 - **Baseline machine learning models**: Automatic training and evaluation of simple models
 - **Structured notebook generation**: Comprehensive Jupyter reports with all analyses
 
-## Requirements
+## file Requirements
 
 - Python 3.9+
 - Libraries: pandas, numpy, matplotlib, seaborn, nbformat, scipy, scikit-learn
