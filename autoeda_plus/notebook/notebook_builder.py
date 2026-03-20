@@ -12,8 +12,9 @@ from autoeda_plus.visualization.plot_engine import (generate_histogram, generate
                                        generate_correlation_heatmap, generate_scatterplot, generate_missing_values_plot)
 from autoeda_plus.ml.baseline_models import train_baseline_model
 from autoeda_plus.insights.insight_generator import generate_insights, generate_feature_engineering_suggestions
+from autoeda_plus.cleaning.data_cleaner import clean_dataset
 
-def build_comprehensive_eda_notebook(csv_path: str, output_path: str = 'EDA_report.ipynb') -> None:
+def build_comprehensive_eda_notebook(csv_path: str, output_path: str = 'EDA_report.ipynb', *, clean: bool = False, no_plots: bool = False, summary_only: bool = False, cap_outliers: bool = False) -> None:
     """
     Build a comprehensive EDA notebook.
 
@@ -31,15 +32,23 @@ def build_comprehensive_eda_notebook(csv_path: str, output_path: str = 'EDA_repo
 
     # Perform all analyses
     column_types = detect_column_types(df)
-    profile = profile_dataset(df)
-    quality_issues = detect_data_quality_issues(df, column_types)
-    num_stats = compute_numerical_statistics(df, column_types)
-    cat_stats = compute_categorical_statistics(df, column_types)
-    corr_matrix = compute_correlation_matrix(df, column_types)
-    outlier_summary = get_outlier_summary(df, column_types)
-    target_col = detect_potential_target(df, column_types)
-    ml_results = train_baseline_model(df, target_col, column_types)
-    insights = generate_insights(df, column_types, corr_matrix, outlier_summary)
+
+    cleaned_df = df
+    cleaning_report = []
+    if clean:
+        cleaned_df, cleaning_report = clean_dataset(df, column_types, apply_outlier_capping=cap_outliers)
+        # re-detect types after cleaning
+        column_types = detect_column_types(cleaned_df)
+
+    profile = profile_dataset(cleaned_df)
+    quality_issues = detect_data_quality_issues(cleaned_df, column_types)
+    num_stats = compute_numerical_statistics(cleaned_df, column_types)
+    cat_stats = compute_categorical_statistics(cleaned_df, column_types)
+    corr_matrix = compute_correlation_matrix(cleaned_df, column_types)
+    outlier_summary = get_outlier_summary(cleaned_df, column_types)
+    target_col = detect_potential_target(cleaned_df, column_types)
+    ml_results = train_baseline_model(cleaned_df, target_col, column_types)
+    insights = generate_insights(cleaned_df, column_types, corr_matrix, outlier_summary)
     fe_suggestions = generate_feature_engineering_suggestions(column_types, num_stats)
 
     # Create notebook
@@ -82,6 +91,62 @@ print(f'Shape: {df_name}.shape')"""))
     nb.cells.append(new_code_cell(f"print('First 5 rows:')\n{df_name}.head()"))
     nb.cells.append(new_code_cell(f"print('\\nDataset Info:')\n{df_name}.info()"))
     nb.cells.append(new_code_cell(f"print('\\nBasic Statistics:')\n{df_name}.describe(include='all')"))
+
+    # Data Cleaning Report (if applied)
+    if clean:
+        nb.cells.append(new_markdown_cell("## 3. Data Cleaning Report"))
+        if cleaning_report:
+            for line in cleaning_report:
+                nb.cells.append(new_markdown_cell(line))
+        else:
+            nb.cells.append(new_markdown_cell("No cleaning actions performed."))
+        # Add a code cell that performs the same cleaning steps inside the notebook
+        cleaning_code_lines = []
+        cleaning_code_lines.append("# Apply automatic cleaning steps (mirrors offline cleaning)")
+        cleaning_code_lines.append("df = df.copy()")
+        cleaning_code_lines.append("# 1) remove duplicates")
+        cleaning_code_lines.append("df = df.drop_duplicates()")
+        cleaning_code_lines.append("# 2) detect identifier-like columns and drop them")
+        cleaning_code_lines.append("n = len(df)")
+        cleaning_code_lines.append("ids = [c for c in df.columns if n>0 and df[c].nunique(dropna=False)/n >= 0.98]")
+        cleaning_code_lines.append("if ids:")
+        cleaning_code_lines.append("    print('Dropping identifier columns:', ids)")
+        cleaning_code_lines.append("    df = df.drop(columns=ids)")
+        cleaning_code_lines.append("# 3) missing value handling: numeric->median, categorical->mode; drop cols >40% missing")
+        cleaning_code_lines.append("for c in list(df.columns):")
+        cleaning_code_lines.append("    miss = df[c].isna().sum(); frac = miss/len(df) if len(df)>0 else 0")
+        cleaning_code_lines.append("    if frac > 0.4:")
+        cleaning_code_lines.append("        print(f'Dropping {c} due to high missing fraction {frac:.2%}')")
+        cleaning_code_lines.append("        df.drop(columns=[c], inplace=True)")
+        cleaning_code_lines.append("        continue")
+        cleaning_code_lines.append("    if miss>0:")
+        cleaning_code_lines.append("        if pd.api.types.is_numeric_dtype(df[c]):")
+        cleaning_code_lines.append("            df[c] = df[c].fillna(df[c].median())")
+        cleaning_code_lines.append("        else:")
+        cleaning_code_lines.append("            mode = df[c].mode(); df[c] = df[c].fillna(mode.iloc[0] if not mode.empty else 'Unknown')")
+        cleaning_code_lines.append("# 4) convert numeric strings and datetimes where possible")
+        cleaning_code_lines.append("for c in df.select_dtypes(include=['object']).columns:")
+        cleaning_code_lines.append("    try:")
+        cleaning_code_lines.append("        df[c] = pd.to_numeric(df[c], errors='raise')")
+        cleaning_code_lines.append("        print(f'Converted {c} to numeric')")
+        cleaning_code_lines.append("        continue")
+        cleaning_code_lines.append("    except Exception:")
+        cleaning_code_lines.append("        pass")
+        cleaning_code_lines.append("    try:")
+        cleaning_code_lines.append("        df[c] = pd.to_datetime(df[c], errors='raise')")
+        cleaning_code_lines.append("        print(f'Converted {c} to datetime')")
+        cleaning_code_lines.append("    except Exception:")
+        cleaning_code_lines.append("        pass")
+        cleaning_code_lines.append("# 5) standardize categoricals")
+        cleaning_code_lines.append("for c in df.select_dtypes(include=['object']).columns:")
+        cleaning_code_lines.append("    df[c] = df[c].astype(str).str.strip().str.lower()")
+        if cap_outliers:
+            cleaning_code_lines.append("# 6) cap outliers using IQR for numeric columns")
+            cleaning_code_lines.append("for c in df.select_dtypes(include=['number']).columns:")
+            cleaning_code_lines.append("    Q1 = df[c].quantile(0.25); Q3 = df[c].quantile(0.75); IQR = Q3-Q1")
+            cleaning_code_lines.append("    lower = Q1-1.5*IQR; upper = Q3+1.5*IQR")
+            cleaning_code_lines.append("    df[c] = df[c].clip(lower, upper)")
+        nb.cells.append(new_code_cell('\n'.join(cleaning_code_lines)))
 
     # Data Quality Analysis
     nb.cells.append(new_markdown_cell("## 4. Data Quality Analysis"))

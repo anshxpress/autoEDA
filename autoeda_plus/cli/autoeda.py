@@ -26,6 +26,9 @@ Examples:
                        help='Output notebook filename (default: EDA_<dataset>.ipynb)')
     parser.add_argument('--summary-only', action='store_true',
                        help='Generate only summary statistics without plots')
+    parser.add_argument('--clean', action='store_true', help='Apply automatic data cleaning')
+    parser.add_argument('--no-plots', action='store_true', help='Skip generating plots')
+    parser.add_argument('--cap-outliers', action='store_true', help='Cap outliers using IQR during cleaning')
 
     args = parser.parse_args()
 
@@ -47,7 +50,11 @@ Examples:
 
     try:
         print(f"Analyzing {csv_path}...")
-        build_comprehensive_eda_notebook(csv_path, output_path)
+        build_comprehensive_eda_notebook(csv_path, output_path,
+                                         clean=args.clean,
+                                         no_plots=args.no_plots,
+                                         summary_only=args.summary_only,
+                                         cap_outliers=args.cap_outliers)
         print(f"✅ EDA report generated: {output_path}")
         print("📊 Analysis complete! Open the notebook to explore your data insights.")
     except Exception as e:
