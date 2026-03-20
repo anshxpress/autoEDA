@@ -1,75 +1,225 @@
-# OFFLINE AutoEDA++
+# AutoEDA++
 
-Automated OFFLINE Intelligent Exploratory Data Analysis
+Automated Intelligent Exploratory Data Analysis
 
-## Installation
+---
 
-1. Clone or download the repository.
-2. Install dependencies: `pip install -r requirements.txt`
+## 🚀 Quick Start (Working Setup – Verified)
 
-Or install as a package:
+### 1. Clone the Repository
 
-```bash
-pip install -e .
+```powershell
+git clone https://github.com/anshxpress/autoEDA.git
+cd autoEDA
 ```
 
-## Usage
+---
 
-Run the tool with a CSV file:
+### 2. Create Virtual Environment
 
-```bash
-autoeda sample.csv
+```powershell
+python -m venv venv
 ```
 
-Or with custom output:
+Activate it:
 
-```bash
-autoeda sample.csv --output my_analysis.ipynb
+```powershell
+venv\Scripts\activate
 ```
 
-Options:
+---
 
-- `--output filename`: Specify output notebook name (default: EDA_dataset.ipynb)
-- `--summary-only`: Generate only summary statistics without plots
+### 3. Install Dependencies
 
-## Features
+```powershell
+cd autoEDA
+pip install -r requirements.txt
+```
 
-- **Automatic dataset profiling**: Column type inference, missing value detection, duplicate analysis
-- **Statistical summaries**: Comprehensive metrics for numerical and categorical features
-- **Data quality diagnostics**: Detection of common dataset issues and inconsistencies
-- **Visualization system**: Histograms, boxplots, count plots, correlation heatmaps, scatter plots
-- **Correlation analysis**: Matrix computation and strong relationship detection
-- **Outlier detection**: IQR and Z-score methods with visual confirmation
-- **Feature engineering suggestions**: Automated recommendations for data preprocessing
-- **Baseline machine learning models**: Automatic training and evaluation of simple models
-- **Structured notebook generation**: Comprehensive Jupyter reports with all analyses
+---
 
-## file Requirements
+### 4. Run AutoEDA++
+
+#### ▶ Run with sample dataset:
+
+```powershell
+python -m autoeda_plus.cli.autoeda "sample.csv"
+```
+
+#### ▶ Run with custom dataset:
+
+```powershell
+python -m autoeda_plus.cli.autoeda "D:\autoEDA\autoEDA\retail_store_sales.csv"
+```
+
+---
+
+## 📂 Output
+
+- Output notebook is generated automatically inside:
+
+```bash
+autoEDA/output/
+```
+
+Example:
+
+```bash
+EDA_retail_store_sales.ipynb
+```
+
+Open with:
+
+```powershell
+code output\EDA_retail_store_sales.ipynb
+```
+
+OR
+
+```powershell
+jupyter notebook output
+```
+
+---
+
+## ⚙️ CLI Options
+
+```bash
+--output <file.ipynb>     Custom output notebook name
+--summary-only           Generate only summary statistics
+--clean                  Apply automatic data cleaning
+--no-plots               Skip visualization generation
+--cap-outliers           Cap outliers using IQR (with --clean)
+```
+
+---
+
+## 🧪 Example Commands
+
+### ✔ Full analysis
+
+```powershell
+python -m autoeda_plus.cli.autoeda "data.csv"
+```
+
+### ✔ With cleaning
+
+```powershell
+python -m autoeda_plus.cli.autoeda "data.csv" --clean
+```
+
+### ✔ Fast mode (no plots)
+
+```powershell
+python -m autoeda_plus.cli.autoeda "data.csv" --summary-only
+```
+
+### ✔ Clean + optimize
+
+```powershell
+python -m autoeda_plus.cli.autoeda "data.csv" --clean --cap-outliers --no-plots
+```
+
+---
+
+## 🔥 Features
+
+- Automatic dataset profiling
+- Missing value & duplicate detection
+- Statistical summaries (numerical + categorical)
+- Data quality diagnostics
+- Visualization system (histograms, boxplots, heatmaps)
+- Correlation analysis
+- Outlier detection (IQR + Z-score)
+- Feature engineering suggestions
+- Baseline ML models
+- Structured Jupyter notebook generation
+
+---
+
+## 🧠 Requirements
 
 - Python 3.9+
-- Libraries: pandas, numpy, matplotlib, seaborn, nbformat, scipy, scikit-learn
+- pandas
+- numpy
+- matplotlib
+- seaborn
+- scipy
+- scikit-learn
+- nbformat
 
-## Development
+---
 
-To run tests:
+## ⚠️ Troubleshooting
 
-```bash
-pip install pytest
-pytest
+### ❌ Virtual environment not activating
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 ```
 
-To lint:
+---
 
-```bash
-pip install ruff
-ruff check .
+### ❌ Module not found
+
+Make sure:
+
+```powershell
+(venv) PS D:\autoEDA\autoEDA>
 ```
 
-To type check:
+---
 
-```bash
-pip install mypy
-mypy .
+### ❌ CSV encoding error
 
--- $env:PYTHONPATH = "D:\autoEDA\autoeda"; python autoeda_plus\cli\autoeda.py 'location.csv'
+Try re-saving CSV as UTF-8 or modify loader:
+
+```python
+pd.read_csv(file, encoding='latin1')
 ```
+
+---
+
+## 📌 Project Structure
+
+```
+autoEDA/
+│
+├── autoeda_plus/
+│   ├── cli/
+│   ├── cleaning/
+│   ├── notebook/
+│
+├── output/
+├── autoeda_runner.py
+├── requirements.txt
+```
+
+---
+
+## 💡 Notes
+
+- Always run commands from inside:
+
+```
+autoEDA/autoEDA
+```
+
+- Use full file paths to avoid path issues
+- Works fully offline
+
+---
+
+## 🚀 Future Improvements (Optional)
+
+- Multi-CSV relational EDA
+- LLM-based insights generation
+- Streamlit dashboard integration
+- Automated feature store
+
+---
+
+## ⭐ Contribute
+
+Feel free to fork, improve, and raise PRs!
+
