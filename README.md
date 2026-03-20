@@ -1,4 +1,4 @@
-# AutoEDA++
+# OFFLINE AutoEDA
 
 Automated Intelligent Exploratory Data Analysis
 
