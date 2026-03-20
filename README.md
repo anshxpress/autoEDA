@@ -1,4 +1,4 @@
-# OFFLINE AutoEDA
+# CLI AutoEDA
 
 Automated Intelligent Exploratory Data Analysis
 
