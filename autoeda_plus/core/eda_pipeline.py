@@ -11,7 +11,7 @@ import pandas as pd
 
 from autoeda_plus.core.data_loader import load_csv
 from autoeda_plus.core.schema_detector import detect_column_types, detect_potential_target
-from autoeda_plus.cleaning.data_cleaner import clean_dataset
+from autoeda_plus.cleaning.data_cleaner import clean_dataset, InsufficientDataError
 from autoeda_plus.core.data_profiler import profile_dataset, detect_data_quality_issues
 from autoeda_plus.analysis.statistics_engine import compute_numerical_statistics, compute_categorical_statistics
 from autoeda_plus.analysis.correlation_engine import compute_correlation_matrix
@@ -44,13 +44,16 @@ def run_pipeline(csv_path: str,
     # Schema detection
     column_types = detect_column_types(df)
 
-    # Cleaning
     cleaning_report = []
     cleaned_df = df
     if clean:
-        cleaned_df, cleaning_report = clean_dataset(df, column_types, apply_outlier_capping=cap_outliers)
-        # re-detect types
-        column_types = detect_column_types(cleaned_df)
+        try:
+            cleaned_df, cleaning_report = clean_dataset(df, column_types, apply_outlier_capping=cap_outliers)
+            # re-detect types
+            column_types = detect_column_types(cleaned_df)
+        except InsufficientDataError as e:
+            cleaning_report = [str(e)]
+            print(f"Cleaning error: {e}")
 
     # Profiling and diagnostics
     profile = profile_dataset(cleaned_df)
