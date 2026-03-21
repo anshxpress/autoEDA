@@ -150,35 +150,17 @@ python -m autoeda_plus.cli.autoeda "data.csv" --clean --cap-outliers --no-plots
 
 ---
 
-## ⚠️ Troubleshooting
+## ⚠️ Custom Commands
 
-### ❌ Virtual environment not activating
+# From d:\autoeda\autoEDA
+python -m autoeda_plus.cli.autoeda "D:\file.csv"
 
-```powershell
-Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
-```
+# Custom output
+python -m autoeda_plus.cli.autoeda "D:\file.csv" -o output\my_report.ipynb
 
----
+# Skip cleaning
+python -m autoeda_plus.cli.autoeda "D:\file.csv" --no-clean
 
-### ❌ Module not found
-
-Make sure:
-
-```powershell
-(venv) PS D:\autoEDA\autoEDA>
-```
-
----
-
-### ❌ CSV encoding error
-
-Try re-saving CSV as UTF-8 or modify loader:
-
-```python
-pd.read_csv(file, encoding='latin1')
-```
-
----
 
 ## 📌 Project Structure
 
