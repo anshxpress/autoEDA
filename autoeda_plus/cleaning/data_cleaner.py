@@ -108,9 +108,9 @@ def clean_data(
     steps.append(s2)
 
     # ──────────────────────────────────────────────────────────────────────────
-    # Step 3 — Handle missing values
+    # Step 3 — Handle missing values (Kaggle Section 4: Backfilling)
     # ──────────────────────────────────────────────────────────────────────────
-    s3 = StepResult(3, "Handle Missing Values")
+    s3 = StepResult(3, "Handle Missing Values (Time-series Bfill)")
     if df.isnull().any().any():
         cols_to_check = list(df.columns)
         for col in cols_to_check:
@@ -118,7 +118,7 @@ def clean_data(
                 continue
             missing_ratio = df[col].isnull().mean()
 
-            # Drop first if ratio is critical
+            # Drop first if ratio is critical (>40%)
             if missing_ratio > 0.4:
                 df.drop(columns=[col], inplace=True)
                 msg = f"{col}: dropped (>{int(missing_ratio*100)}% missing)"
@@ -126,23 +126,22 @@ def clean_data(
                 continue
 
             if missing_ratio > 0:
-                if pd.api.types.is_numeric_dtype(df[col]):
-                    try:
-                        median_val = df[col].median()
-                        df[col] = df[col].fillna(median_val)
-                        msg = f"{col}: filled {int(missing_ratio*100)}% missing with median ({median_val:.4g})"
-                        s3.add(msg);  log.append(msg)
-                    except Exception:
-                        pass
-                else:
-                    try:
-                        mode_vals = df[col].mode()
-                        if not mode_vals.empty:
-                            df[col] = df[col].fillna(mode_vals[0])
-                            msg = f"{col}: filled {int(missing_ratio*100)}% missing with mode ('{mode_vals[0]}')"
-                            s3.add(msg);  log.append(msg)
-                    except Exception:
-                        pass
+                # Section 4 Specification: Use backfilling for sensor data
+                try:
+                    # Apply bfill first, then ffill for any remaining trailing NaNs
+                    df[col] = df[col].bfill().ffill()
+                    
+                    # Final safety check if the entire column was NaN
+                    if df[col].isnull().any():
+                        if pd.api.types.is_numeric_dtype(df[col]):
+                            df[col] = df[col].fillna(df[col].median() if df[col].notna().any() else 0)
+                        else:
+                            df[col] = df[col].fillna(df[col].mode().iloc[0] if not df[col].mode().empty else "missing")
+                    
+                    msg = f"{col}: filled {int(missing_ratio*100)}% missing using bfill/ffill"
+                    s3.add(msg);  log.append(msg)
+                except Exception as e:
+                    logger.warning(f"Failed to impute {col}: {e}")
         if not s3.messages:
             s3.mark_nothing_to_do()
     else:
@@ -253,8 +252,9 @@ def clean_data(
     for col in list(df.columns):
         try:
             # Only flag as identifier if it's not numeric (pure IDs tend to be strings/ints)
-            if df[col].nunique(dropna=False) == len(df):
-                id_cols.append(col)
+            if not pd.api.types.is_numeric_dtype(df[col]):
+                if df[col].nunique(dropna=False) == len(df):
+                    id_cols.append(col)
         except Exception:
             pass
     if id_cols:

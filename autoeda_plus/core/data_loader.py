@@ -2,10 +2,11 @@
 AutoEDA++ — Data Loader
 =======================
 Supports CSV, Excel, JSON, and Parquet with automatic encoding detection.
+Also supports multi-file loading with vertical concatenation.
 """
 import os
 import pandas as pd
-from typing import Tuple
+from typing import Tuple, List
 
 
 SUPPORTED_FORMATS = {
@@ -98,3 +99,45 @@ def validate_dataset(df: pd.DataFrame) -> Tuple[bool, str]:
     if df.shape[1] < 2:
         return False, "Dataset must have at least 2 columns"
     return True, "Dataset loaded successfully"
+
+
+# ── Multi-file loader ─────────────────────────────────────────────────────────
+def load_multiple_files(
+    file_paths: List[str],
+    add_source_col: bool = True,
+) -> pd.DataFrame:
+    """
+    Load multiple data files and concatenate them vertically (row-wise).
+
+    Each file is loaded with full format support (CSV, Excel, JSON, Parquet).
+    A 'source_file' column is added to track provenance.
+
+    Parameters
+    ----------
+    file_paths     : List of paths to data files.
+    add_source_col : If True, adds a 'source_file' column (default True).
+
+    Returns
+    -------
+    pd.DataFrame — merged dataset.
+    """
+    if not file_paths:
+        raise ValueError("No file paths provided to load_multiple_files()")
+
+    frames: List[pd.DataFrame] = []
+    for path in file_paths:
+        df = load_data(path)
+        if add_source_col:
+            df["source_file"] = os.path.basename(path)
+        frames.append(df)
+
+    merged = pd.concat(frames, ignore_index=True)
+
+    print(f"\n[Loader] 🔗 Merged {len(file_paths)} file(s) → "
+          f"{merged.shape[0]:,} rows × {merged.shape[1]} columns")
+    if add_source_col:
+        counts = merged["source_file"].value_counts()
+        for fname, cnt in counts.items():
+            print(f"          ↳ {fname}: {cnt:,} rows")
+
+    return merged
